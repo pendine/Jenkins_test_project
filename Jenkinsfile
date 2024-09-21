@@ -29,33 +29,23 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Run Docker Container') {
             steps {
                 script {
-                    docker.build("your-docker-image:${env.BUILD_NUMBER}")
+                    docker.image('nginx:latest').run('-p 80:80')
                 }
             }
         }
 
-        stage('Docker Push') {
-            steps {
-                script {
-                    docker.withRegistry('https://your-docker-registry', 'docker-credentials-id') {
-                        docker.image("your-docker-image:${env.BUILD_NUMBER}").push()
-                    }
-                }
-            }
-        }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    withKubeConfig([credentialsId: 'kubernetes-credentials-id', serverUrl: 'https://172.30.1.65:6443']) {
-                        sh "kubectl set image deployment/your-deployment your-container=your-docker-image:${env.BUILD_NUMBER}"
-                    }
-                }
-            }
-        }
+//         stage('Deploy to Kubernetes') {
+//             steps {
+//                 script {
+//                     withKubeConfig([credentialsId: 'kubernetes-credentials-id', serverUrl: 'https://172.30.1.65:6443']) {
+//                         sh "kubectl set image deployment/your-deployment your-container=your-docker-image:${env.BUILD_NUMBER}"
+//                     }
+//                 }
+//             }
+//         }
     }
 
     post {
